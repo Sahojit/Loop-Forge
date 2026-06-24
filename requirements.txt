@@ -1,0 +1,46 @@
+fastapi==0.115.6
+uvicorn==0.34.0
+python-dotenv==1.0.1
+pydantic==2.10.4
+pydantic[email]==2.10.4
+
+# Auth
+python-jose==3.3.0
+cryptography==44.0.0
+passlib==1.7.4
+bcrypt==4.2.1
+
+# Rate limiting
+slowapi==0.1.9
+
+# Database
+asyncpg==0.30.0
+redis==5.2.1
+hiredis==3.1.0
+
+# Vector memory
+chromadb==0.6.3
+
+# Task queue
+celery==5.4.0
+
+# LangGraph / LangChain
+langgraph==0.2.73
+langchain==0.3.18
+langchain-core==0.3.34
+
+# LLMs
+huggingface_hub==0.27.1
+groq==0.13.1
+
+# Tools
+tavily-python==0.5.0
+yfinance==0.2.51
+
+# Observability
+langfuse==2.59.3
+sentry-sdk==2.20.0
+
+# UI
+streamlit==1.41.1
+requests==2.32.3
