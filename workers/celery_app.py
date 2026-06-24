@@ -15,6 +15,11 @@ celery_app = Celery(
     backend=os.getenv("REDIS_URL", "redis://localhost:6379/0"),
 )
 
+celery_app.conf.imports = (
+    "workers.celery_app",
+    "workers.loop_runner",
+)
+
 celery_app.conf.update(
     task_serializer="json",
     result_serializer="json",
@@ -31,11 +36,9 @@ celery_app.conf.update(
 
 @celery_app.task(
     name="loopforge.run_loop_task",
-    bind=True,
     max_retries=0,
 )
 def run_loop_task(
-    self,
     task_id: str,
     user_id: str,
     role: str,

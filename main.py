@@ -13,7 +13,7 @@ from auth.middleware import AuthMiddleware
 from security.error_handler import global_exception_handler, http_exception_handler
 from security.rate_limiter import limiter
 from observability.sentry_setup import init_sentry
-from api.routes import tasks, auth, health
+from api.routes import tasks, auth, health, skills, loops, hooks, notifications
 
 
 @asynccontextmanager
@@ -23,6 +23,10 @@ async def lifespan(app: FastAPI):
 
     init_sentry()
     await init_db()
+    from db.models import LOOP_STUDIO_TABLES_SQL
+    pool = await __import__("db.postgres", fromlist=["get_pool"]).get_pool()
+    async with pool.acquire() as _conn:
+        await _conn.execute(LOOP_STUDIO_TABLES_SQL)
     yield
     await close_pool()
     await close_redis()
@@ -43,7 +47,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
     allow_credentials=True,
-    allow_methods=["GET", "POST"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
     allow_headers=["Authorization", "Content-Type"],
 )
 
@@ -56,3 +60,7 @@ app.add_exception_handler(Exception, global_exception_handler)
 app.include_router(health.router)
 app.include_router(auth.router)
 app.include_router(tasks.router)
+app.include_router(skills.router)
+app.include_router(loops.router)
+app.include_router(hooks.router)
+app.include_router(notifications.router)

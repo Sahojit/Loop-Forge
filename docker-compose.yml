@@ -53,12 +53,30 @@ services:
     environment:
       DATABASE_URL: postgresql+asyncpg://loopforge:${POSTGRES_PASSWORD:-changeme_in_prod}@postgres:5432/loopforge
       REDIS_URL: redis://redis:6379
+      PYTHONPATH: /app
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
     command: ["celery", "-A", "workers.celery_app", "worker", "--loglevel=info", "--concurrency=2"]
+
+  celery-beat:
+    build: .
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://loopforge:${POSTGRES_PASSWORD:-changeme_in_prod}@postgres:5432/loopforge
+      REDIS_URL: redis://redis:6379
+      REDBEAT_REDIS_URL: redis://redis:6379
+      PYTHONPATH: /app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: ["celery", "-A", "workers.celery_app", "beat", "--scheduler", "redbeat.RedBeatScheduler", "--loglevel=info"]
+    restart: unless-stopped
 
   ui:
     build: .
